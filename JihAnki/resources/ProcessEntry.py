@@ -5,8 +5,6 @@ import LangUtils
 tagger = MeCab.Tagger()
 
 
-df = pd.read_excel("./ExampleBook.xlsx",header=0)
-df.fillna("", inplace=True)
 
 tagger = MeCab.Tagger()
 
@@ -18,8 +16,7 @@ tagger = MeCab.Tagger()
 # <!--user-->
 overrideTag= "<!--user-->"
 
-df = pd.read_excel("./ExampleBook.xlsx",header=0)
-df.fillna("", inplace=True)
+
 
 # tag pattern by line:
 # 0. identified piece ver batim
@@ -55,21 +52,14 @@ def ExceptionFilter(entry):
 
 
 #%%
-def create_hyougen(idx:int, debug=""):
+def create_hyougen(hyougenStr):
     # pass this dict to reibun creator for highlighting
     reibunResource={
         "hyougen"   : None,
-        "idx"       : idx,
         "fragments" : []
     }
     kirei_hyougen =""
-    entry = df.iloc[idx].values
-    if debug != "":
-        entry=[None, debug]
-        print("ProcessEntry.create_hyougen warning - arg idx "+str(idx)+\
-              " overridden in favour of debug '"+debug+"'")
-        reibunResource["idx"]=None
-    cleanHyou=entry[1].strip().strip("。")
+    cleanHyou=hyougenStr.strip().strip("。")
     reibunResource["hyougen"]=cleanHyou
     EntryParse = tagger.parse(cleanHyou).split("\n")
     for line in EntryParse:
@@ -98,13 +88,7 @@ def create_hyougen(idx:int, debug=""):
 
 
 
-def create_reibun(hyougenDict:dict, debug=""):
-    kirei_hyougen =""
-    entry = df.iloc[hyougenDict["idx"]].values
-    if hyougenDict["idx"] is None:
-        entry=[None, debug]
-        print("ProcessEntry.create_reibun warning - arg idx "+str(idx)+\
-              " overridden in favour of debug '"+debug+"'")
+def create_reibun(phraseStr, hyougenDict:dict):
     outsentence=""
     pronounciation=""
     recap=""
@@ -122,7 +106,7 @@ def create_reibun(hyougenDict:dict, debug=""):
             return True
         return False
 
-    phrase=df.iloc[hyougenDict["idx"]].values[4]
+    phrase=phraseStr
     if phrase=="":
         return ""
     EntryParse=tagger.parse(phrase)
@@ -164,12 +148,16 @@ def create_reibun(hyougenDict:dict, debug=""):
     outstring = outstring.replace("<b></b>","").replace("</b><b>","")
     return outstring
 
-def ProcessEntry(idx:int):
-    hyougenface, HGdict = create_hyougen(773)
-    reibunface = create_reibun(HGdict)
+def parseEntry(hyougen, phrase):
+    hyougenface, HGdict = create_hyougen(hyougen)
+    reibunface = create_reibun(phrase, HGdict)
     return hyougenface, reibunface
 
 if __name__=="__main__":
-    cardface, HGdict = create_hyougen(773)
+    df = pd.read_excel("./ExampleBook.xlsx",header=0)
+    df.fillna("", inplace=True)
+    cardface, HGdict = create_hyougen(774)
     print(HGdict)
     print(create_reibun(HGdict))
+
+# %%
