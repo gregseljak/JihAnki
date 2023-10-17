@@ -97,10 +97,10 @@ takobotoCollection=load("Takoboto")["result"]
 takobotoIDlist=[]
 for entry in takobotoCollection:
     takobotoIDlist.append(entry["noteId"])
-requests.post(URL,json={
+res = requests.post(URL,json={
     'action':"deleteNotes",
     "version":6,
-    "params":{"note":takobotoIDlist}}
+    "params":{"notes":takobotoIDlist}}
     )
 
 userDF = pd.DataFrame(data=np.empty((len(takobotoCollection),
