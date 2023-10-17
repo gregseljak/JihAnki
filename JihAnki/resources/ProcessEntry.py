@@ -136,7 +136,7 @@ def create_reibun(phraseStr, hyougenDict:dict):
                 recap+="<br><b>"+LineParse[3]\
                     +"    --    "\
                     +LU.standardize_phonetic(LineParse)\
-                    +r"<\b>"
+                    +"</b>"
             else:
                 pass
                 #print(LineParse[0]+"failed to be interesting")

@@ -7,13 +7,19 @@ NStag = "nameserver"
 windowsIP=windowsIP[windowsIP.find(NStag)+len(NStag)+1:]
 windowsIP=windowsIP.strip("\n")
 URL = "http://"+windowsIP+":8765"
-def load():
+def load(deckname):
+    if deckname=="JihAnki":
+        model="JihAnki"
+    else:
+        model="jp.takoboto"
     res = requests.get(URL,timeout=1.0)
     res = requests.post(URL, json={
         'action': 'findNotes',
         'version': 6,
         'params': {
-            'query': 'deck:JihAnki',
+            'query': 'deck:'+deckname+" "\
+                     'note:'+model
+            ,
         },
     }).json()
     detail_res = requests.post(URL, json={
@@ -24,8 +30,9 @@ def load():
         },
     }).json()
     return detail_res
-existingCollection=load()["result"]
+existingCollection=load("JihAnki")["result"]
 
+#%%
 import pandas as pd
 import numpy as np
 colnames = ["entryID",
@@ -42,9 +49,11 @@ userColnames=["hyougen",
               "reibun",
               "reibun_imi",
               "source_tag"]
+#%%
 def AnkiConnect_to_Pandas(collection):
+    adhocColNames = list(collection[0]["fields"].keys())
     preDF = pd.DataFrame(data=np.empty((len(collection),9),dtype=str),
-                        columns=colnames)
+                        columns=adhocColNames)
     for i in range(len(collection)):
         entry = collection[i]["fields"]
         for key in colnames:
@@ -82,15 +91,38 @@ import os
 from datetime import datetime
 datestr = datetime.today().strftime('%Y_%m_%d')
 existingDF=AnkiConnect_to_Pandas(existingCollection)
+
+#%%
+takobotoCollection=load("Takoboto")["result"]
+takobotoIDlist=[]
+for entry in takobotoCollection:
+    takobotoIDlist.append(entry["noteId"])
+requests.post(URL,json={
+    'action':"deleteNotes",
+    "version":6,
+    "params":{"note":takobotoIDlist}}
+    )
+
+userDF = pd.DataFrame(data=np.empty((len(takobotoCollection),
+                                     len(colnames)),dtype=str),
+                columns=colnames)
+for i in range(len(takobotoCollection)):
+    note = takobotoCollection[i]["fields"]
+    userDF.at[i,"hyougen"]=note["Japanese"]["value"]
+    userDF.at[i,"imi"]=note["Meaning"]["value"]
+    userDF.at[i,"reibun"]=note["Sentence"]["value"]
+    userDF.at[i,"reibun_imi"]=note["SentenceMeaning"]["value"]
+    userDF.at[i,"source_tag"]="takoboto"
 localxl = "/home/greg/nihongo/JihAnki/resources/_jihanki.xlsx"
 os.popen("cp ~/grego/Desktop/JihAnki.xlsx "\
             +localxl)
 path_to_outcsv="~/nihongo/JihAnki/outputCsv/out_"+datestr
 #%%
-userDF=pd.read_excel(localxl,sheet_name="userSheet",header=0)
-userDF.fillna("", inplace=True)
+XLuserDF=pd.read_excel(localxl,sheet_name="userSheet",header=0)
+XLuserDF.fillna("", inplace=True)
 def filter_rows_by_values(df, col, values):
     return df[~df[col].isin(values)]
+XLuserDF=filter_rows_by_values(XLuserDF, "hyougen", userDF.hyougen.values)
 userDF=filter_rows_by_values(userDF, "hyougen", existingDF.hyougen.values)
 #%%
 prevMax = 0
@@ -103,11 +135,12 @@ userDF["audio"]=""
 userDF["hyougen_yomikata"]=""
 userDF["reibun_yomikata"]=""
 import ProcessEntry as pe
-for i in range(10):#range(len(userDF)):
+#%%
+for i in range(len(userDF)):
     userDF.at[i, "hyougen"]=userDF.at[i, "hyougen"].replace(" ","")
     HGback, RBback = pe.parseEntry(userDF.at[i, "hyougen"],
                     userDF.at[i, "reibun"])
-    userDF.at[i,"hyougen_yomikata"]=HGback
+    userDF.at[i,"yomikata"]=HGback
     userDF.at[i,"reibun_yomikata"]=RBback
 AddFromDF(userDF)
 
@@ -125,3 +158,4 @@ userDF.to_excel("~/grego/Desktop/JihAnki.xlsx",
                 index=False,
                 header=userColnames,
                 )
+# %%
