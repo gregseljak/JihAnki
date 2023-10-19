@@ -110,7 +110,19 @@ def standardize_phonetic(entry):
     outParse=entry[1]
     while "ー" in outParse:
         d = outParse.find("ー")
-        insertChar=entry[2][d]
+        if len(entry[2])>=len(outParse):
+            insertChar=entry[2][d]
+        # the only known exception is "~yo <-> you"
+        elif to_katakana(outParse[d-1]) in katakana_u:
+            insertChar="う"
+        elif to_katakana(outParse[d-1]) in katakana_o:
+            insertChar="う"
+        elif to_katakana(outParse[d-1]) in katakana_i:
+            insertChar="い"
+        elif to_katakana(outParse[d-1]) in katakana_e:
+            insertChar="い"
+        elif to_katakana(outParse[d-1]) in katakana_a:
+            insertChar="あ"
         outParse=outParse[:d]+insertChar+outParse[d+1:]
     outParse=to_hiragana(outParse)
     return outParse
