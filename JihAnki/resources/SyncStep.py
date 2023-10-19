@@ -84,7 +84,7 @@ def AddFromDF(myDF):
                 'notes': mycol,
             },
         }).json()
-
+    return res
 #def main():
 #%%
 import os
@@ -97,11 +97,13 @@ takobotoCollection=load("Takoboto")["result"]
 takobotoIDlist=[]
 for entry in takobotoCollection:
     takobotoIDlist.append(entry["noteId"])
-res = requests.post(URL,json={
-    'action':"deleteNotes",
-    "version":6,
-    "params":{"notes":takobotoIDlist}}
-    )
+def flushNotes():
+    res = requests.post(URL,json={
+        'action':"deleteNotes",
+        "version":6,
+        "params":{"notes":takobotoIDlist}}
+        )
+flushNotes()
 
 userDF = pd.DataFrame(data=np.empty((len(takobotoCollection),
                                      len(colnames)),dtype=str),
@@ -137,14 +139,18 @@ userDF["reibun_yomikata"]=""
 import ProcessEntry as pe
 #%%
 for i in range(len(userDF)):
+    print(i)
+    print(userDF.at[i,"hyougen"])
+    print(userDF.at[i,"reibun"])
     userDF.at[i, "hyougen"]=userDF.at[i, "hyougen"].replace(" ","")
     HGback, RBback = pe.parseEntry(userDF.at[i, "hyougen"],
                     userDF.at[i, "reibun"])
     userDF.at[i,"yomikata"]=HGback
     userDF.at[i,"reibun_yomikata"]=RBback
-AddFromDF(userDF)
+addRes = AddFromDF(userDF)
 
 existingDF = pd.concat([existingDF, userDF])
+#%%
 existingDF.to_excel("~/grego/Documents/Nihongo/backend_JihAnki.xlsx",
                      sheet_name="backend_sheet",
                      columns=colnames,
@@ -152,10 +158,16 @@ existingDF.to_excel("~/grego/Documents/Nihongo/backend_JihAnki.xlsx",
                      header=True
                      )
 #%%
-userDF=pd.DataFrame(data=np.empty((1,len(userColnames)),dtype=str),columns=userColnames)
-userDF.to_excel("~/grego/Desktop/JihAnki.xlsx",
+BKuserDF=pd.DataFrame(data=np.empty((1,len(userColnames)),dtype=str),
+                      columns=userColnames)
+BKuserDF.to_excel("~/grego/Desktop/JihAnki.xlsx",
                 sheet_name="userSheet",
                 index=False,
                 header=userColnames,
                 )
+res = requests.post(URL,json={
+    "action": "sync",
+    "version": 6
+})
+
 # %%
