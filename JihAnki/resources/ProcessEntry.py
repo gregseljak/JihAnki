@@ -74,12 +74,12 @@ def create_hyougen(hyougenStr):
                 LineParse[3]=LineParse[3][:LineParse[3].find("-")]
         # add pronounciation to the card face
         if recapcriteria(LineParse):
-            kirei_hyougen+="<br><b>"\
+            kirei_hyougen+="<br><strong>"\
                 +LineParse[3]+"    --    "\
                 +LU.standardize_phonetic(LineParse)\
-                +"</b>"
+                +"</strong>"
 
-    kirei_hyougen="<b>"+cleanHyou+"</b><br>"+kirei_hyougen
+    kirei_hyougen="<strong>"+cleanHyou+"</strong><br>"+kirei_hyougen
 
     return kirei_hyougen, reibunResource
 
@@ -102,7 +102,7 @@ def create_reibun(phraseStr, hyougenDict:dict):
             return False
         if LU.bool_Interesting(entry):
             return True
-        if outsentence.endswith("</b>"):
+        if outsentence.endswith("</strong>"):
             return True
         return False
 
@@ -128,15 +128,15 @@ def create_reibun(phraseStr, hyougenDict:dict):
             #print("yomikata = "+Yomikata)
         
         if hilitecriteria(LineParse,hyougenDict):
-            Kakikata = "<b>"+Kakikata+"</b>"
-            Yomikata = "<b>"+Yomikata+"</b>"
+            Kakikata = "<strong>"+Kakikata+"</strong>"
+            Yomikata = "<strong>"+Yomikata+"</strong>"
             # stronger condition to add to recap
 
             if recapcriteria(LineParse,hyougenDict):
-                recap+="<br><b>"+LineParse[3]\
+                recap+="<br><strong>"+LineParse[3]\
                     +"    --    "\
                     +LU.standardize_phonetic(LineParse)\
-                    +"</b>"
+                    +"</strong>"
             else:
                 pass
                 #print(LineParse[0]+"failed to be interesting")
@@ -145,7 +145,7 @@ def create_reibun(phraseStr, hyougenDict:dict):
         pronounciation+=Yomikata
     outsentence+="<br>"
     outstring = outsentence+"<br>\n"+pronounciation+"<br>\n"+recap
-    outstring = outstring.replace("<b></b>","").replace("</b><b>","")
+    outstring = outstring.replace("<strong></strong>","").replace("</strong><strong>","")
     return outstring
 
 def parseEntry(hyougen, phrase):
