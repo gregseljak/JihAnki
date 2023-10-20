@@ -103,7 +103,7 @@ def flushNotes():
         "version":6,
         "params":{"notes":takobotoIDlist}}
         )
-flushNotes()
+
 
 userDF = pd.DataFrame(data=np.empty((len(takobotoCollection),
                                      len(colnames)),dtype=str),
@@ -138,15 +138,14 @@ userDF["hyougen_yomikata"]=""
 userDF["reibun_yomikata"]=""
 import ProcessEntry as pe
 #%%
-for i in range(len(userDF)):
-    print(i)
-    print(userDF.at[i,"hyougen"])
-    print(userDF.at[i,"reibun"])
+for j in range(len(userDF)):
+    i=userDF.index.values[j]
     userDF.at[i, "hyougen"]=userDF.at[i, "hyougen"].replace(" ","")
     HGback, RBback = pe.parseEntry(userDF.at[i, "hyougen"],
                     userDF.at[i, "reibun"])
     userDF.at[i,"yomikata"]=HGback
     userDF.at[i,"reibun_yomikata"]=RBback
+#%%
 addRes = AddFromDF(userDF)
 
 existingDF = pd.concat([existingDF, userDF])
@@ -169,5 +168,5 @@ res = requests.post(URL,json={
     "action": "sync",
     "version": 6
 })
-
+flushNotes()
 # %%
