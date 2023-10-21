@@ -3,12 +3,14 @@ godan_ends = list("うくぐすつぬふぶむる")
 jpob = "（"
 jpcb = "）"
 
-katakana_a = "aアカガサザタダナハバパマヤラワ"
+katakana_a = "aァャヵアカガサザタダナハバパマヤラワ"
+phonetic_a=katakana_a+""
 #12449 to 
 katakana_i = "iイキギシジチヂニヒビピミリヰ"
-katakana_u = "uウクグスズツヅヌフブプムユル"
-katakana_e = "eエケゲセゼテデネヘベペメレヱ"
-katakana_o = "oオコゴソゾトドノホボポモヨロヲ"
+katakana_u = "uゥュウクグスズツヅヌフブプムユル"
+katakana_e = "eェヶエケゲセゼテデネヘベペメレヱ"
+katakana_o = "oォョオコゴソゾトドノホボポモヨロヲ"
+
 
 intMIN_KATA=12448
 
@@ -123,7 +125,12 @@ def standardize_phonetic(entry):
             insertChar="い"
         elif to_katakana(outParse[d-1]) in katakana_a:
             insertChar="あ"
-        outParse=outParse[:d]+insertChar+outParse[d+1:]
+        try:
+            outParse=outParse[:d]+insertChar+outParse[d+1:]
+        except UnboundLocalError:
+            print("LangUtils unable to parse the entry ")
+            print("  ::  ".join(entry))
+            quit()
     outParse=to_hiragana(outParse)
     return outParse
 

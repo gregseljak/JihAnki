@@ -154,10 +154,18 @@ def parseEntry(hyougen, phrase):
     return hyougenface, reibunface
 
 if __name__=="__main__":
-    df = pd.read_excel("./ExampleBook.xlsx",header=0)
-    df.fillna("", inplace=True)
-    cardface, HGdict = create_hyougen(774)
-    print(HGdict)
-    print(create_reibun(HGdict))
+    import argparse
+    parser=argparse.ArgumentParser()
+    parser.add_argument("-x", "--hyougen",
+            help="hyougen")
+    parser.add_argument("-s", "--sentence",
+            help="sentence")
+    args=parser.parse_args()
+    hg=parseEntry(args.hyougen,args.sentence)
+    print("HGf: "+args.hyougen)
+    print("HGb: "+hg[0])
+    print()
+    print("RBf: "+args.sentence)
+    print("RBb: "+hg[1])
 
 # %%
