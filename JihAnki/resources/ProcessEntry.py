@@ -160,6 +160,59 @@ def parseEntry(hyougen, phrase):
     reibunface = create_reibun(phrase, HGdict)
     return hyougenface, reibunface
 
+def sync_to_anki(hyougen, rei_face, rei_back):
+    import requests
+    with open("/etc/resolv.conf") as file:
+        windowsIP = file.read()
+    file.close()
+    NStag = "nameserver"
+    windowsIP=windowsIP[windowsIP.find(NStag)+len(NStag)+1:]
+    windowsIP=windowsIP.strip("\n")
+    URL = "http://"+windowsIP+":8765"
+    res = requests.post(URL, json={
+        'action': 'findNotes',
+        'version': 6,
+        'params': {
+            'query': 'deck:'+"JihAnki"+" "\
+                     'hyougen:'+hyougen
+            ,
+        },
+    }).json()
+    detail_res = requests.post(URL, json={
+        'action': 'notesInfo',
+        'version': 6,
+        'params': {
+            'notes': res['result']
+        },
+    }).json()
+    noteID = ((detail_res["result"])[0])["noteId"]
+
+    modification_res = requests.post(URL,json={
+    "action": "updateNoteFields",
+    "version": 6,
+    "params": {
+        "note": {
+            "id": noteID,
+            "fields": {
+                "reibun": rei_face,
+                "reibun_yomikata": rei_back,
+                "reibun_imi":"",
+            },
+        }
+    }
+    })
+    print(str(modification_res)=="<Response [200]>")
+
+
+
+def simple_print(args):
+    hg=parseEntry(args.hyougen,args.sentence)
+    print("HGf: "+args.hyougen)
+    print("HGb: "+hg[0])
+    print()
+    print("RBf: "+args.sentence)
+    print("RBb: "+hg[1])
+
 if __name__=="__main__":
     import argparse
     parser=argparse.ArgumentParser()
@@ -169,10 +222,6 @@ if __name__=="__main__":
             help="sentence")
     args=parser.parse_args()
     hg=parseEntry(args.hyougen,args.sentence)
-    print("HGf: "+args.hyougen)
-    print("HGb: "+hg[0])
-    print()
-    print("RBf: "+args.sentence)
-    print("RBb: "+hg[1])
+    sync_to_anki(args.hyougen,args.sentence,hg[1])
 
 # %%
