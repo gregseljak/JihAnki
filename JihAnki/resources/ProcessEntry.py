@@ -1,7 +1,7 @@
 #%%
 import pandas as pd
 import MeCab
-import LangUtils
+
 tagger = MeCab.Tagger()
 
 
@@ -49,6 +49,13 @@ def ExceptionFilter(entry):
         entry[1]="は"
         entry[2]="は"
     return entry
+
+def decomposeKanji(kanji:str):
+    """ take a kanji; return its 1.components 2. base translation
+        This stuff rules!
+    """
+    #TODO
+    pass
 
 
 #%%
