@@ -1,6 +1,6 @@
 #%%
 import requests
-import AC_utils as AC
+import AC_utils as AC #ankiconnect utils
 
 URL=AC.URL
 #%%
@@ -9,14 +9,17 @@ import numpy as np
 
 colnames=AC.colnames
 userColnames=AC.userColnames
-
-
+### Check if card browser is open (bug: silently prevents updates if true)
+if AC.CardBrowserOpen():
+    print("Card browser is open; aborting SyncStep")
+    quit()
 ### Make a DF for existing collection, a DF for new entries
 import os
 from datetime import datetime
 datestr = datetime.today().strftime('%Y_%m_%d')
 
 existingCollection=AC.load("JihAnki")["result"]
+
 existingDF=AC.AnkiConnect_to_Pandas(existingCollection,colnames)
 
 takobotoCollection=AC.load("Takoboto")["result"]
@@ -87,7 +90,7 @@ BKuserDF.to_excel("~/grego/Desktop/JihAnki.xlsx",
                 index=False,
                 header=userColnames,
                 )
-path_to_outcsv="~/nihongo/JihAnki/outputCsv/out_"+datestr
+path_to_outcsv="~/nihongo/JihAnki/outputCsv/out_"+datestr+".csv"
 BKuserDF.to_csv(path_to_outcsv,
                 index=False,
                 header=userColnames,

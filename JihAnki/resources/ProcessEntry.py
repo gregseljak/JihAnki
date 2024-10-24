@@ -162,13 +162,11 @@ def parseEntry(hyougen, phrase):
 
 def sync_to_anki(hyougen, rei_face, rei_back):
     import requests
-    with open("/etc/resolv.conf") as file:
-        windowsIP = file.read()
-    file.close()
-    NStag = "nameserver"
-    windowsIP=windowsIP[windowsIP.find(NStag)+len(NStag)+1:]
-    windowsIP=windowsIP.strip("\n")
-    URL = "http://"+windowsIP+":8765"
+    import AC_utils
+    # New method since WSL2 2.0.0
+    # Requires windowsIP mirroring
+
+    URL="http://127.0.0.1:8765"
     res = requests.post(URL, json={
         'action': 'findNotes',
         'version': 6,
@@ -186,7 +184,7 @@ def sync_to_anki(hyougen, rei_face, rei_back):
         },
     }).json()
     noteID = ((detail_res["result"])[0])["noteId"]
-
+    AC_utils.SelectCard(0) # DEselects cards; prevents http conflict
     modification_res = requests.post(URL,json={
     "action": "updateNoteFields",
     "version": 6,
@@ -197,10 +195,12 @@ def sync_to_anki(hyougen, rei_face, rei_back):
                 "reibun": rei_face,
                 "reibun_yomikata": rei_back,
                 "reibun_imi":"",
+                "source_tag":"gpt",
             },
         }
     }
     })
+    AC_utils.SelectCard(noteID) # snap back to the modified card
     print(str(modification_res)=="<Response [200]>")
 
 
@@ -220,8 +220,18 @@ if __name__=="__main__":
             help="hyougen")
     parser.add_argument("-s", "--sentence",
             help="sentence")
+    parser.add_argument("-a", "--anki", default=True)
+    #parser.add_argument("-h", "--help", default=False)
     args=parser.parse_args()
-    hg=parseEntry(args.hyougen,args.sentence)
-    sync_to_anki(args.hyougen,args.sentence,hg[1])
-
+    
+    if args.anki:
+        if False:
+            print(' -x : hyougen (should be a str directly in kanji/kana, surrounded with "")'+\
+                  "\n -s : sentence (should be in same format as hyougen)"+\
+                  "\n -a : bool, default=True; Updates Anki directly")
+        else:
+            hg=parseEntry(args.hyougen,args.sentence)
+            sync_to_anki(args.hyougen,args.sentence,hg[1])
+    else:
+        simple_print(args)
 # %%

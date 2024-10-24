@@ -1,4 +1,4 @@
-#%%
+"""AnkiConnect utility functions"""
 import requests
 import pandas as pd
 import numpy as np
@@ -18,15 +18,25 @@ userColnames=["hyougen",
               "reibun_imi",
               "source_tag"]
 
+# New method since WSL2 2.0.0
+# Requires windowsIP mirroring
 
-with open("/etc/resolv.conf") as file:
-    windowsIP = file.read()
-file.close()
-NStag = "nameserver"
-windowsIP=windowsIP[windowsIP.find(NStag)+len(NStag)+1:]
-windowsIP=windowsIP.strip("\n")
-URL = "http://"+windowsIP+":8765"
+URL="http://127.0.0.1:8765"
 #%%
+
+
+def SelectCard(id:int):
+    res = requests.get(URL,timeout=1.0)
+    res = requests.post(URL, json={
+        "action":"guiSelectNote",
+        "version": 6,
+        "params":{"note":id} # dummy card (clears selection)    
+    })
+    return res
+
+def CardBrowserOpen():
+    return SelectCard(0).json()["result"]
+
 def load(deckname):
     if deckname=="JihAnki":
         model="JihAnki"
@@ -82,6 +92,7 @@ def Pandas_to_JHKCollection(df):
             "deckName":"JihAnki",
             "modelName":"JihAnki",
             "fields":fieldsdict,
+            "tags":["N2prep"], # changed
         })
     return outCollection
 
@@ -101,3 +112,6 @@ def flushNotes(deckname="Takoboto"):
         )
     return res
 # %%
+if __name__=="__main__":
+    print("checkBrowserOpen: ")
+    print(CardBrowserOpen())
