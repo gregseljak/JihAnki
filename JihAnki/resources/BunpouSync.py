@@ -83,6 +83,8 @@ for idx in range(len(flagged_card_info)):
         prevmax=0
         for jhb_note in existing_notes:
             prevmax=max(prevmax, int(jhb_note["fields"]["entryID"]["value"]))
+        # Some DJOG entries have inconsistent formatting; remove ASCII chars
+        gp= ''.join([i if ord(i)>128 else '' for i in dg_fields["Grammar Point"]["value"]])
         res=requests.post(AC.URL,json={
             "action":"addNote",
             "version":6,
@@ -92,7 +94,7 @@ for idx in range(len(flagged_card_info)):
                     "modelName":"jihanki_bunpou",
                     "fields":{
                         "entryID":str(prevmax+1),
-                        "hyougen":dg_fields["Grammar Point"]["value"],
+                        "hyougen":gp,
                         "imi":dg_fields["Explanation"]["value"],
                         "dojg grammar point":dg_fields["Grammar Point"]["value"]
                     }
