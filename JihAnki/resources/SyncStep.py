@@ -100,5 +100,5 @@ res = requests.post(URL,json={
     "version": 6
 })
 AC.flushNotes("Takoboto")
-
+os.run("python3 ~/nihongo/JihAnki/BunpouSync.py")
 # %%

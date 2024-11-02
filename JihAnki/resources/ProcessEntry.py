@@ -59,8 +59,9 @@ def decomposeKanji(kanji:str):
 
 
 #%%
-def create_hyougen(hyougenStr):
-    # pass this dict to reibun creator for highlighting
+def create_hyougen(hyougenStr:str):
+    # Takes input e.g. "毎日"
+    # pass output dict to create_reibun for highlighting
     reibunResource={
         "hyougen"   : None,
         "fragments" : []
@@ -95,7 +96,8 @@ def create_hyougen(hyougenStr):
 
 
 
-def create_reibun(phraseStr, hyougenDict:dict):
+def create_reibun(phraseStr, hyougenDict:dict={"hyougen":"","fragments":[]}):
+    #ex. phraseStr: "毎日パンを食べる"
     outsentence=""
     pronounciation=""
     recap=""

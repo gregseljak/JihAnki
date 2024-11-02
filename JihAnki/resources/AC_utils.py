@@ -23,7 +23,9 @@ userColnames=["hyougen",
 
 URL="http://127.0.0.1:8765"
 #%%
-
+def request(json):
+    res=requests.post(URL, json)
+    return res.json()
 
 def SelectCard(id:int):
     res = requests.get(URL,timeout=1.0)
@@ -37,11 +39,16 @@ def SelectCard(id:int):
 def CardBrowserOpen():
     return SelectCard(0).json()["result"]
 
-def load(deckname):
-    if deckname=="JihAnki":
-        model="JihAnki"
+def load(deckname, cardType=None):
+    if cardType==None:
+        if deckname=="JihAnki":
+            model="JihAnki"
+        if deckname=="Takoboto":
+            model="jp.takoboto"
+        if deckname=="~DOJG":
+            model="aDOJG"
     else:
-        model="jp.takoboto"
+        model=cardType
     res = requests.get(URL,timeout=1.0)
     res = requests.post(URL, json={
         'action': 'findNotes',
