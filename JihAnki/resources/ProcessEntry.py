@@ -1,16 +1,9 @@
 #%%
 import pandas as pd
 import MeCab
-
-tagger = MeCab.Tagger()
-
-
-
-tagger = MeCab.Tagger()
-
-#debug
-import numpy as np
 import LangUtils as LU
+import pitch_accent as PA
+
 tagger = MeCab.Tagger()
 ### User override tag:
 # <!--user-->
@@ -57,6 +50,9 @@ def decomposeKanji(kanji:str):
     #TODO
     pass
 
+def intonation_decorator(cleanHyou:str):
+    """apply "lover, lunder, over, under tags as needed"""
+    pass
 
 #%%
 def create_hyougen(hyougenStr:str):
@@ -82,10 +78,16 @@ def create_hyougen(hyougenStr:str):
                 LineParse[3]=LineParse[3][:LineParse[3].find("-")]
         # add pronounciation to the card face
         if recapcriteria(LineParse):
-            kirei_hyougen+="<br><strong>"\
-                +LineParse[3]+"    --    "\
-                +LU.standardize_phonetic(LineParse)\
-                +"</strong>"
+            kirei_hyougen+="<br><strong>"
+            pitchyomi=PA.decorate_pitchtags(LineParse[3])
+            if pitchyomi==LineParse[3]:
+                # backup - original redundant decorator
+                kirei_hyougen+=LineParse[3]+"    --    "+LU.standardize_phonetic(LineParse)
+            else:
+                kirei_hyougen+=pitchyomi
+            kirei_hyougen+="</strong>"
+
+                
 
     kirei_hyougen="<strong>"+cleanHyou+"</strong><br>"+kirei_hyougen
 
