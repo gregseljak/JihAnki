@@ -79,8 +79,8 @@ def create_hyougen(hyougenStr:str):
         # add pronounciation to the card face
         if recapcriteria(LineParse):
             kirei_hyougen+="<br><strong>"
-            pitchyomi=PA.decorate_pitchtags(LineParse[3])
-            if pitchyomi==LineParse[3]:
+            pitchyomi=PA.decorate_pitchtags(LineParse[3],LU.standardize_phonetic(LineParse))
+            if pitchyomi==LineParse[3]: # failure
                 # backup - original redundant decorator
                 kirei_hyougen+=LineParse[3]+"    --    "+LU.standardize_phonetic(LineParse)
             else:

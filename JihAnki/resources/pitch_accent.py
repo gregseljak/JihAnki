@@ -42,6 +42,8 @@ def decorate_pitchtags(hyougen:str, yomikata=None)->str:
     """
     outstr=""
     entry=pitchdf.loc[pitchdf['word']==hyougen]
+    if yomikata is not None:
+        entry=entry.loc[entry["kana"].apply(LU.to_katakana)==LU.to_katakana(yomikata)]
     if entry.values.shape[0]>0: # entry found
         df_yomikata=entry["kana"].values[0]
         if yomikata is not None:
@@ -69,24 +71,26 @@ def decorate_pitchtags(hyougen:str, yomikata=None)->str:
     outstr+=cap
     return outstr
 
-def legacy_replace(hyougen):
+def legacy_replace(hyougen, yomikata):
     """ check if the pitchdf entry exists;
     try to match with my old card style element
     in order to tag and replace"""
     entry=pitchdf.loc[pitchdf['word']==hyougen]
+    if yomikata is not None:
+        entry=entry.loc[entry["kana"].apply(LU.to_katakana)==LU.to_katakana(yomikata)]
     if entry.values.shape[0]>0: # entry found
         df_yomikata=entry["kana"].values[0]
     else: return False
     return hyougen+4*" "+"--"+4*" "+df_yomikata
 
 
-def sync_to_anki(hyougen):
+def sync_to_anki(hyougen, yomikata=None):
     import requests
     import AC_utils
     # New method since WSL2 2.0.0
     # Requires windowsIP mirroring
     URL="http://127.0.0.1:8765"
-    target_str=legacy_replace(hyougen)
+    target_str=legacy_replace(hyougen, yomikata)
     if target_str==False:
         print(hyougen+"not found in pitchdf")
         return 1
@@ -135,6 +139,8 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument("-x", "--hyougen",
             help="hyougen")
+    parser.add_argument("-y", "--yomikata",
+            help="yomikata")
     args=parser.parse_args()
-    sync_to_anki(args.hyougen)
+    sync_to_anki(args.hyougen,args.yomikata)
     
