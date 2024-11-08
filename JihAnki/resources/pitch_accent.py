@@ -83,7 +83,6 @@ def legacy_replace(hyougen, yomikata):
     else: return False
     return hyougen+4*" "+"--"+4*" "+df_yomikata
 
-
 def sync_to_anki(hyougen, yomikata=None):
     import requests
     import AC_utils
@@ -113,7 +112,7 @@ def sync_to_anki(hyougen, yomikata=None):
             'notes': res['result']
         },
     }).json()
-    pitchstr=decorate_pitchtags(hyougen)
+    pitchstr=decorate_pitchtags(hyougen,yomikata)
     noteID = ((detail_res["result"])[0])["noteId"]
     old_yomikata=((detail_res["result"])[0])["fields"]["yomikata"]["value"]
     old_reiyomi=((detail_res["result"])[0])["fields"]["reibun_yomikata"]["value"]
