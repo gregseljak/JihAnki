@@ -3,3 +3,78 @@
 <hr id=answer>
 
 <span style="font-family: Liberation Sans; font-size: 40px;  ">{{yomikata}}<br><span style="font-family: Liberation Sans; font-size: 30px;  ">{{hint:imi}}</span><br><br>{{audio}}</span>
+
+<!-- -->
+<div>
+    <!-- Button to trigger popup -->
+    <button id="showImagesBtn">Henshall</button>
+
+    <!-- Hidden div that will show images when the button is clicked -->
+    <div id="imagesPopup" style="display: none;">
+        <!-- Container where images will be appended -->
+    </div>
+</div>
+
+<style>
+    #imagesPopup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(150, 150, 150, 0.9);
+        padding: 5px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        cursor: pointer;
+    		max-height: 90vh;
+				overflow-y: scroll;
+				width: 90%;
+				max-width: 100%;
+    }
+
+    #imagesPopup img {
+				margin: 0 auto 10px;
+        display: block;
+        margin-bottom: 10px;
+        max-width: 100%;
+        border-radius: 4px;
+    }
+</style>
+
+<script>
+    const showImagesBtn = document.getElementById('showImagesBtn');
+    const imagesPopup = document.getElementById('imagesPopup');
+
+    // Field value from Anki that contains image identifiers
+    const desiredImages = "{{hyougen}}";
+
+    // Show images when the button is clicked
+    showImagesBtn.addEventListener('click', function() {
+    // Clear any previously appended images
+    imagesPopup.innerHTML = '';
+
+    // Loop through each character in the desiredImages field
+    for (let char of desiredImages) {
+        // Check if the character is kanji
+        if (char.charCodeAt(0) >= 19969 && char.charCodeAt(0) >= 47) {
+            // Create a new img element for each valid character
+            let img = document.createElement('img');
+            img.src = `${char}_hsl.png`; // Replace with actual image path logic if necessary
+            img.alt = `Err: Couldn't find "${char}_hsl.png"`;
+            // Append the image to the popup container
+            imagesPopup.appendChild(img);
+        }
+    }
+
+    // Display the popup if there are valid images
+    if (imagesPopup.children.length > 0) {
+        imagesPopup.style.display = 'block';
+    }
+    });
+
+    // Hide the popup when it is clicked
+    imagesPopup.addEventListener('click', function() {
+        imagesPopup.style.display = 'none';
+    });
+</script>
