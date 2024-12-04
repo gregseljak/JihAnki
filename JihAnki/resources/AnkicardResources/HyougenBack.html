@@ -2,19 +2,35 @@
 
 <hr id=answer>
 
-<span style="font-family: Liberation Sans; font-size: 40px;  ">{{yomikata}}<br><span style="font-family: Liberation Sans; font-size: 30px;  ">{{hint:imi}}</span><br><br>{{audio}}</span>
+<span style="font-family: Liberation Sans; font-size: 40px;  ">{{yomikata}}<br>
 
-<!-- -->
-<div>
-    <!-- Button to trigger popup -->
-    <button id="showImagesBtn">Henshall</button>
 
-    <!-- Hidden div that will show images when the button is clicked -->
-    <div id="imagesPopup" style="display: none;">
-        <!-- Container where images will be appended -->
-    </div>
-</div>
 
+
+<button id="showTextPopup", onclick="showTextPopup()">辞典</button>
+<div id="textPopup", onclick="closeTextPopup()"></div>
+
+<script>
+    function showTextPopup() {
+        // Get the text from the desired Anki field
+        var text = '{{jiten}}';
+
+        // Set the text content of the popup
+        var popup = document.getElementById('textPopup');
+        popup.innerHTML = text;
+        popup.style.display = 'block';
+    }
+
+    function closeTextPopup() {
+        document.getElementById('textPopup').style.display = 'none';
+    }
+</script>
+
+<br><span style="font-family: Liberation Sans; font-size: 30px;  "><br>{{hint:imi}}</span><br><br>{{audio}}</span>
+
+
+
+<!-- Henshall Popup -->
 <style>
     #imagesPopup {
         position: fixed;
@@ -42,6 +58,17 @@
     }
 </style>
 
+<div>
+    <!-- Button to trigger popup -->
+    <button id="showImagesBtn">Henshall</button>
+
+    <!-- Hidden div that will show images when the button is clicked -->
+    <div id="imagesPopup", style="display: none;">
+    </div>
+</div>
+
+
+
 <script>
     const showImagesBtn = document.getElementById('showImagesBtn');
     const imagesPopup = document.getElementById('imagesPopup');
@@ -56,7 +83,7 @@
 
     // Loop through each character in the desiredImages field
     for (let char of desiredImages) {
-        // Check if the character is kanji
+        // Check if the character's Unicode value is between 41 and 47
         if (char.charCodeAt(0) >= 19969 && char.charCodeAt(0) >= 47) {
             // Create a new img element for each valid character
             let img = document.createElement('img');
@@ -78,3 +105,4 @@
         imagesPopup.style.display = 'none';
     });
 </script>
+<!-- /henshall -->
