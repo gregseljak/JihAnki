@@ -1,5 +1,77 @@
+
+<!-- hello world -->
 {{FrontSide}}
 
 <hr id=answer>
 
 <span style="font-family: Liberation Sans; font-size: 40px; ">{{reibun_yomikata}}<br><span style="font-family: Liberation Sans; font-size: 30px; ">{{hint:reibun_imi}}</span><br><br>{{audio}}</span>
+<!-- Henshall Popup -->
+<div>
+    <!-- Button to trigger popup -->
+    <button class="bigbutton"  id="showImagesBtn">辞典</button>
+
+    <!-- Hidden div that will show images when the button is clicked -->
+    <div id="imagesPopup" class="popup" style="display: none;">
+    </div>
+</div>
+
+<style>
+    .popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(255,255,255,0.95);
+        padding: 5px;
+        border: 5px solid rgba(150, 150, 150, 0.9);
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        cursor: pointer;
+        max-height: 90vh;
+        overflow-y: scroll;
+        width: 90%;
+        max-width: 100%;
+        font-size: 35px;    
+}
+
+    #imagesPopup img {
+        margin: 0 auto 10px;
+        display: block;
+        margin-bottom: 10px;
+        max-width: 100%;
+        border-radius: 4px;
+    }
+</style>
+
+<script>
+    const showImagesBtn = document.getElementById('showImagesBtn');
+    const imagesPopup = document.getElementById('imagesPopup');
+    const desiredImages = "{{hyougen}}";
+    // Show images when the button is clicked
+    showImagesBtn.addEventListener('click', function() {
+    // Clear any previously appended images
+    imagesPopup.innerHTML = '<div class="left-justified">{{jiten}}<br><br><hr style="width: 90%; margin: 0 auto; border: 1px solid black;"></div><br>';
+    // Loop through each character in the desiredImages field
+    for (let char of desiredImages) {
+        // Check if the character's Unicode value is between 41 and 47
+        if (char.charCodeAt(0) >= 19969 && char.charCodeAt(0) >= 47) {
+            // Create a new img element for each valid character
+            let img = document.createElement('img');
+            img.src = `${char}_hsl.png`; // Replace with actual image path logic if necessary
+            img.alt = `Err: Couldn't find "${char}_hsl.png"`;
+            // Append the image to the popup container
+            imagesPopup.appendChild(img);
+        }
+    }
+    // Display the popup if there are valid images
+    if (imagesPopup.children.length > 0) {
+        imagesPopup.style.display = 'block';
+    }
+    });
+    // Hide the popup when it is clicked
+    imagesPopup.addEventListener('click', function() {
+        imagesPopup.style.display = 'none';
+    });
+</script>
+<!-- /henshall -->

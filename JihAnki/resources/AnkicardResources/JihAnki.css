@@ -1,0 +1,80 @@
+.card {
+ font-family: arial;
+ font-size: 20px;
+ text-align: center;
+ color: black;
+ background-color: white;
+ font-weight: 200;
+}
+/* pitch accent */
+:root {
+  --pitchcolor: #87c2fa;
+}
+
+b {
+  font-weight: 600;
+}
+
+.lover,
+.lunder,
+.under,
+.over{
+    position: relative;
+}
+.left-justified {
+    text-align: left;
+    font-size: 35px;
+  }
+
+.lunder::before,
+.lover::before {
+    content: "";
+		position: relative; top: -4px;
+    display: inline-block;
+    border-left: 4px solid var(--pitchcolor);
+    height: 1.3em;
+    margin-right: -1px;
+		margin-left: 0px;
+    vertical-align: middle;
+}
+
+.lover::after,
+.over::after {
+    content: "";
+    display: inline-block;
+    width: calc(100% + 4px);
+    border-top: 4px solid var(--pitchcolor);
+    position: absolute;
+    top: -6px;
+    left: 0px;
+}
+
+.lunder::after,
+.under::after{
+    content: "";
+    display: inline-block;
+    width: calc(100% + 4.5px);
+    border-bottom: 4px solid var(--pitchcolor);
+    position: absolute;
+    bottom: -4.5px;
+    right: -4px;
+}
+/* /pitch accent */
+
+.bigbutton {
+
+    align-items: center;
+    justify-content: center;
+    height: 50px; /* or your desired height */
+
+    font-size: 30px !important;   /* Increases the text size */
+    padding: 3px 3px; /* Adds space inside the button */
+    width: 150px;       /* Sets a fixed width (optional) */
+    height: 50px;       /* Sets a fixed height (optional) */
+    border-radius: 8px; /* Rounds the edges */
+  }
+
+
+.card1 { background-color: #ffffff; }
+.card2 { background-color: #ffffff; }
+.card3 { background-color: #ffffff; }

@@ -1,56 +1,44 @@
 {{FrontSide}}
-
 <hr id=answer>
 
 <span style="font-family: Liberation Sans; font-size: 40px;  ">{{yomikata}}<br>
-
-
-
-
-<button id="showTextPopup", onclick="showTextPopup()">辞典</button>
-<div id="textPopup", onclick="closeTextPopup()"></div>
-
-<script>
-    function showTextPopup() {
-        // Get the text from the desired Anki field
-        var text = '{{jiten}}';
-
-        // Set the text content of the popup
-        var popup = document.getElementById('textPopup');
-        popup.innerHTML = text;
-        popup.style.display = 'block';
-    }
-
-    function closeTextPopup() {
-        document.getElementById('textPopup').style.display = 'none';
-    }
-</script>
 
 <br><span style="font-family: Liberation Sans; font-size: 30px;  "><br>{{hint:imi}}</span><br><br>{{audio}}</span>
 
 
 
 <!-- Henshall Popup -->
+<div>
+    <!-- Button to trigger popup -->
+    <button class="bigbutton"  id="showImagesBtn">辞典</button>
+
+    <!-- Hidden div that will show images when the button is clicked -->
+    <div id="imagesPopup" class="popup" style="display: none;">
+    </div>
+</div>
+
 <style>
-    #imagesPopup {
+    .popup {
         position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background-color: rgba(150, 150, 150, 0.9);
+        background-color: rgba(255,255,255,0.95);
         padding: 5px;
+        border: 5px solid rgba(150, 150, 150, 0.9);
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         z-index: 1000;
         cursor: pointer;
-    		max-height: 90vh;
-				overflow-y: scroll;
-				width: 90%;
-				max-width: 100%;
-    }
+        max-height: 90vh;
+        overflow-y: scroll;
+        width: 90%;
+        max-width: 100%;
+        font-size: 35px;    
+}
 
     #imagesPopup img {
-				margin: 0 auto 10px;
+        margin: 0 auto 10px;
         display: block;
         margin-bottom: 10px;
         max-width: 100%;
@@ -58,29 +46,14 @@
     }
 </style>
 
-<div>
-    <!-- Button to trigger popup -->
-    <button id="showImagesBtn">Henshall</button>
-
-    <!-- Hidden div that will show images when the button is clicked -->
-    <div id="imagesPopup", style="display: none;">
-    </div>
-</div>
-
-
-
 <script>
     const showImagesBtn = document.getElementById('showImagesBtn');
     const imagesPopup = document.getElementById('imagesPopup');
-
-    // Field value from Anki that contains image identifiers
     const desiredImages = "{{hyougen}}";
-
     // Show images when the button is clicked
     showImagesBtn.addEventListener('click', function() {
     // Clear any previously appended images
-    imagesPopup.innerHTML = '';
-
+    imagesPopup.innerHTML = '<div class="left-justified">{{jiten}}<br><br><hr style="width: 90%; margin: 0 auto; border: 1px solid black;"></div><br>';
     // Loop through each character in the desiredImages field
     for (let char of desiredImages) {
         // Check if the character's Unicode value is between 41 and 47
@@ -93,16 +66,15 @@
             imagesPopup.appendChild(img);
         }
     }
-
     // Display the popup if there are valid images
     if (imagesPopup.children.length > 0) {
         imagesPopup.style.display = 'block';
     }
     });
-
     // Hide the popup when it is clicked
     imagesPopup.addEventListener('click', function() {
         imagesPopup.style.display = 'none';
     });
 </script>
 <!-- /henshall -->
+
