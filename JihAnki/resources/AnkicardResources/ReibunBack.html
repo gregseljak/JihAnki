@@ -58,8 +58,8 @@
         if (char.charCodeAt(0) >= 19969 && char.charCodeAt(0) >= 47) {
             // Create a new img element for each valid character
             let img = document.createElement('img');
-            img.src = `${char}_hsl.png`; // Replace with actual image path logic if necessary
-            img.alt = `Err: Couldn't find "${char}_hsl.png"`;
+            img.src = `_${char}_hsl.png`; // Replace with actual image path logic if necessary
+            img.alt = `Err: Couldn't find "_${char}_hsl.png"`;
             // Append the image to the popup container
             imagesPopup.appendChild(img);
         }
