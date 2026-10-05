@@ -1,12 +1,15 @@
-# Requires (oubunsha_jiten venv) to export
+
 #%%
+import re
+import MeCab
+tagger = MeCab.Tagger()
 import pandas as pd
-import ConjugateWords
 dictpath="/home/greg/nihongo/JihAnki/resources/oubunsha.csv"
 df=None
+#%%
 try:
     df=pd.read_csv(dictpath)
-except:
+except FileNotFoundError:
     print("OubunshaLookup didn't find "+dictpath)
     pass
 df.dropna(inplace=True)
@@ -24,36 +27,40 @@ def beautify_description(desc):
     outstr=""
     SplitCharacters=["①","②","③","④","🈩","🈔"]
     posChar=["（副）","（名・自スル）","（名・自他スル）","｟俗｠","（副・形動ダ）"]
+
     titleidx=desc.find("】")+1
+
     if titleidx==0: #not found
         titleidx=desc.find("<br>")
-    titleidx=min(titleidx,desc.find("<br>")) # あからさま exception
+    titleidx=min(titleidx,desc.find("<br>"))
     if titleidx==-1:
         return desc # just give up
     headword="<u><strong>"+desc[:titleidx]+"</u></strong>"
     desc=desc[titleidx:]
+
     sections=desc.split("<br>")[1:]
+
     # sections[0] superfluous information (?)
     # part-of-speech information
 
     # terrible logic for some pretty insane edge cases (see わんわん)
-    posidx=-1
-    for char in SplitCharacters:
-        try:
+    try:
+        posidx=-1
+        for char in SplitCharacters:
             if sections[0].find(char)>-1:
                 posidx=max(posidx,sections[0].find(char)+len(char))
-        except:
-            print(desc)
-    if(posidx==-1 or posidx>=len(sections[0])):
-        posSection=sections[0]
-    else:
-        posSection=sections[0][:posidx]
-    # move pos tags into the title line
-    for char in posChar:
-        if char in posSection:
-            headword+=char
-            sections[0]=sections[0][:sections[0].find(char)]+\
-                sections[0][sections[0].find(char)+len(char):]
+        if(posidx==-1 or posidx>=len(sections[0])):
+            posSection=sections[0]
+        else:
+            posSection=sections[0][:posidx]
+        # move pos tags into the title line
+        for char in posChar:
+            if char in posSection:
+                headword+=char
+                sections[0]=sections[0][:sections[0].find(char)]+\
+                    sections[0][sections[0].find(char)+len(char):]
+    except:
+        print(posidx)
     # actual list of definitions/uses
     for section in sections:
         if str.isspace(section) or len(section)==0:
@@ -101,50 +108,30 @@ def lookup(hyougen):
 def increase_font(lookup):
     style=''' <body style="margin: 20px;"><span style="font-size:30px">'''
     return style+lookup+"</span></body> "
+from IPython.display import display, HTML
 
-def generate_dict():
-    oubunsha_dict={}
-    conflicts={}
-    for i in range(0,len(df)):
-        if i%100==0:
-            print(f"{i}/{len(df)}")
-        word=df["hyougen"].values[i]
-        try:
-            entry=increase_font(lookup(word))
-        except:
-            print(str(i)+" : "+word)
-            break
-        headwords=ConjugateWords.generate(word)
-        for headword in headwords:
-            if headword==word:
-                oubunsha_dict[word]=entry
-            elif headword in df["hyougen"].values:
-                conflicts[headword]=entry
-            else:
-                oubunsha_dict[headword]=entry
-    return oubunsha_dict,conflicts
-oubunsha_dict, conflicts= generate_dict()
-print(oubunsha_dict["踏み"])
 #%%
-import json
-with open("oubunsha_boox1.txt","w") as file:
-    file.write(json.dumps(oubunsha_dict))
-with open("oubunsha_boox1_conflicts.txt","w") as file:
-    file.write(json.dumps(conflicts))
+target="あたって砕けろ"
+print(df[df["hyougen"]==target])
+print(lookup(target))
+display(HTML(lookup(target)))
+
 #%%
+### Lemmatizer section
 
-from mdict_utils.base.writemdict import MDictWriter
-"""with open("oubunshadict.txt") as file:
-    oubunsha_dict = json.loads(file.read().replace("30px","9px"))""" 
 #%%
-writer = MDictWriter(
-        oubunsha_dict,
-        title="Greg's OubunshaJiten",
-        description="please work!",
-    )
-with open(f"oubunsha_boox1.mdx", "wb") as wf:
-    writer.write(wf)
-
-
+target="綺麗"
+print(tagger.parse(target).split("\t"))
+display(HTML(lookup(target)))
+# %%
+import numpy as np
+pos=[]
+for target in df["hyougen"].values:
+    try:
+        _pos=tagger.parse(target).split("\n")[0].split("\t")[4]
+    except TypeError:
+        print("TypeError: "+str(target))
+    if _pos not in pos:
+        pos.append(_pos)
 
 # %%
