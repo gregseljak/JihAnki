@@ -5,11 +5,15 @@ dictpath="/home/greg/nihongo/JihAnki/resources/oubunsha.csv"
 df=None
 try:
     df=pd.read_csv(dictpath)
+    df.dropna(inplace=True)
 except:
     print("OubunshaLookup didn't find "+dictpath)
     pass
 #%%
-def list_examples(example_section):
+def list_examples(example_section:str):
+    # oubunsha example sections WITHIN .csv description column
+    # is a substring of the form "―「...」<br>―「...」<br>..." 
+    # this returns a string of the form "<ul><li>...</li><li>...</li></ul>"
     outstr="<ul><li>"
     rei=example_section.replace("<br>","")
     rei=rei.replace("」","」</li><li>")
@@ -55,15 +59,11 @@ def lookup(hyougen):
         print(" Need the Oubunsha df")
         return ""
     search_results=df[df["hyougen"]==hyougen]
-    if len(search_results)==1:
-        search_results=[search_results]
-    for result in search_results:
-        try:
-            yomi=result.kana.values[0]
-        except:
-            return ""
-        desc=result.description.values[0]
-        desc=beautify_description(desc)
+    if len(search_results)==0:
+        print(f"OubunshaLookup.lookup: df[{hyougen}]:")
+        print(search_results)
+    for index,result in search_results.iterrows():
+        desc=beautify_description(result["description"])
         #coutstr+="<strong>"+hyougen+"</strong>    "+yomi
         outstr+=desc+"<br><br><br>"
     while outstr.startswith('<br>'):
@@ -87,11 +87,17 @@ if __name__=="__main__":
     import argparse
     parser=argparse.ArgumentParser()
 
-    parser.add_argument('-a', dest='all', action='store_false', help='Set anki to False')
-    parser.set_defaults(all=True)
+    parser.add_argument('-a', dest='all', action='store_true', help='Set anki to False')
+    parser.add_argument("-x", "--hyougen",
+            help="hyougen")
+    parser.set_defaults(all=False)
     args=parser.parse_args()
     if args.all:
         update_all()
+    if args.hyougen:
+        print(" OubunshaLookup.lookup called on '"+args.hyougen+"'")
+        print(lookup(args.hyougen))
+        AC.update_one(args.hyougen, update_one)
     else:
         print(" Calling python3 OubunshaLookup.py -a will update all cards\n"+\
               " The extra tag is to stop myself from calling it accidentally")

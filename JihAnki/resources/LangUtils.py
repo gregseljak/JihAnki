@@ -112,7 +112,7 @@ def standardize_phonetic(entry):
     outParse=entry[1]
     while "ー" in outParse:
         d = outParse.find("ー")
-        if len(entry[2])>=len(outParse):
+        if len(entry[2])>=len(outParse) and entry[2][d]!="ー":
             insertChar=entry[2][d]
         # the only known exception is "~yo <-> you"
         elif to_katakana(outParse[d-1]) in katakana_u:
@@ -172,8 +172,22 @@ def bool_Interesting(entry, verbose=False):
         if entry[3]=="居る": # iru
             return False
     return True
-
+#%%
 def deconjugate(inword:str):
-    #TODO implement; probably its own class
     pass
-# %%
+
+def get_yomikata(hyougen):
+    """
+        in: hyougen
+        out: list of yomikata
+        (one yomikata for each parsed POS)
+    """
+    import MeCab
+    tagger = MeCab.Tagger()
+    yomikatas=[]
+    entries=tagger.parse(hyougen).split("\n")[:-1]
+    for entry in entries:
+        LineParse=entry.split("\t")
+        if len(LineParse)>2:
+            yomikatas.append(standardize_phonetic(LineParse))
+    return yomikatas

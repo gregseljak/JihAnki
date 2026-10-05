@@ -5,8 +5,22 @@
 
 <br><span style="font-family: Liberation Sans; font-size: 30px;  "><br>{{hint:imi}}</span><br><br>{{audio}}</span>
 
+<script>
+  function userJs1() {
+    // Find all Anki-style hints
+    var hints = document.querySelectorAll('.hint');
 
-
+    // Simulate clicking the first one (or all)
+    for (var i = 0; i < hints.length; i++) {
+      var hint = hints[i];
+      var answer = hint.nextElementSibling;
+      if (answer && answer.style.display === 'none') {
+        hint.style.display = 'none';
+        answer.style.display = 'inline';
+      }
+    }
+  }
+</script>
 <!-- Henshall Popup -->
 <div>
     <!-- Button to trigger popup -->

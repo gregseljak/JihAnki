@@ -50,14 +50,13 @@ def decomposeKanji(kanji:str):
     #TODO
     pass
 
-def intonation_decorator(cleanHyou:str):
-    """apply "lover, lunder, over, under tags as needed"""
-    pass
 
+#%%
 #%%
 def create_hyougen(hyougenStr:str):
     # Takes input e.g. "毎日"
     # pass output dict to create_reibun for highlighting
+    #
     reibunResource={
         "hyougen"   : None,
         "fragments" : []
@@ -68,6 +67,8 @@ def create_hyougen(hyougenStr:str):
     EntryParse = tagger.parse(cleanHyou).split("\n")
     for line in EntryParse:
         LineParse = line.split("\t")
+        #print(LineParse)
+        #print("="*20+"\n")
         if LineParse[0]=="EOS" or LineParse[0]==[""] or len(LineParse)<5:
             break
         # for recognition in 
@@ -92,9 +93,6 @@ def create_hyougen(hyougenStr:str):
     kirei_hyougen="<strong>"+cleanHyou+"</strong><br>"+kirei_hyougen
 
     return kirei_hyougen, reibunResource
-
-
-
 
 
 
@@ -167,6 +165,7 @@ def parseEntry(hyougen, phrase):
 def sync_to_anki(hyougen, rei_face, rei_back):
     import requests
     import AC_utils
+    
     # New method since WSL2 2.0.0
     # Requires windowsIP mirroring
 
@@ -199,7 +198,7 @@ def sync_to_anki(hyougen, rei_face, rei_back):
                 "reibun": rei_face,
                 "reibun_yomikata": rei_back,
                 "reibun_imi":"",
-                "source_tag":"gpt",
+                "source_tag":"",
             },
         }
     }
@@ -217,25 +216,29 @@ def simple_print(args):
     print("RBf: "+args.sentence)
     print("RBb: "+hg[1])
 
+
+
+#%%
 if __name__=="__main__":
     import argparse
+    
     parser=argparse.ArgumentParser()
     parser.add_argument("-x", "--hyougen",
             help="hyougen")
     parser.add_argument("-s", "--sentence",
             help="sentence")
-    parser.add_argument("-a", "--anki", default=True)
+    parser.add_argument('-a', dest='anki', action='store_false', help='Set anki to False')
+    parser.set_defaults(anki=True)
     #parser.add_argument("-h", "--help", default=False)
     args=parser.parse_args()
     
-    if args.anki:
-        if False:
-            print(' -x : hyougen (should be a str directly in kanji/kana, surrounded with "")'+\
-                  "\n -s : sentence (should be in same format as hyougen)"+\
-                  "\n -a : bool, default=True; Updates Anki directly")
-        else:
-            hg=parseEntry(args.hyougen,args.sentence)
-            sync_to_anki(args.hyougen,args.sentence,hg[1])
+    if not args.anki:
+        print(' -x : hyougen (should be a str directly in kanji/kana, surrounded with "")'+\
+                "\n -s : sentence (should be in same format as hyougen)"+\
+                "\n -a : bool, default=True; Updates Anki directly\n\n")
+        entry=parseEntry(args.hyougen,args.sentence)
+        print(entry[0])
+        print(entry[1])
     else:
-        simple_print(args)
-# %%
+        hg=parseEntry(args.hyougen,args.sentence)
+        sync_to_anki(args.hyougen,args.sentence,hg[1])

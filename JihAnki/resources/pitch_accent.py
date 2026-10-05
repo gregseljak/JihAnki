@@ -1,3 +1,9 @@
+#%%
+"""
+Insert HTML tags into a yomikata so as to display pitch accent pattern.
+Todo: get this informaton from takoboto instead of ja_pitch_accents.tsv
+"""
+
 import pandas as pd
 import LangUtils as LU
 
@@ -98,8 +104,7 @@ def sync_to_anki(hyougen, yomikata=None):
         'version': 6,
         'params': {
             'query': 'deck:'+"JihAnki"+" "\
-                     'yomikata:'+'*"'+target_str+'"*'
-            ,
+                     'yomikata:'+'*"'+target_str+'"*',
         },
     }).json()
     if len(res["result"])==0:
@@ -133,6 +138,25 @@ def sync_to_anki(hyougen, yomikata=None):
     AC_utils.SelectCard(noteID) # snap back to the modified card
     print(str(modification_res)=="<Response [200]>")
 
+def update_all():
+    """
+    use with caution
+    """
+    print("You probably don't mean to call pitch_accent.update_all()")
+    return 0
+    import AC_utils as AC
+    import pandas as pd
+    existingCollection=AC.load("JihAnki")["result"]
+    existingDF=AC.AnkiConnect_to_Pandas(existingCollection,AC.colnames)
+    for i in range(len(existingDF)):
+        hyougen=existingDF.iloc[i]["hyougen"]
+        yomikata=existingDF.iloc[i]["yomikata"]
+        start_token="--"+" "*4
+        idx=yomikata.find(start_token)+len(start_token)
+        yomikata=yomikata[idx:]
+        yomikata=yomikata[:yomikata.find("<")]
+        sync_to_anki(hyougen,yomikata)
+#%%
 if __name__=="__main__":
     import argparse
     parser=argparse.ArgumentParser()
